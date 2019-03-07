@@ -1,3 +1,3 @@
 # SetAzureADRole.ps1
 
-Sets an Azure AD Role with Role Group on a Resource Groups across Subscriptions 
+Uses Out-Gridview to choose Role and Role group for assignment to RGs across Azure Subscriptions

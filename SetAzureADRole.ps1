@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Uses Out-Gridview to choose Role and Role group for assignment to an RGs accross Azure Subscriptions
+        Uses Out-Gridview to choose Role and Role group for assignment to RGs across Azure Subscriptions
     .EXAMPLE
         .\SetAzureADRole.ps1
 
