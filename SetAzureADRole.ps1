@@ -14,10 +14,14 @@ if ((Get-AzureRmContext).Account -eq $Null) {
 try {$var = Get-AzureADTenantDetail } 
 catch [Microsoft.Open.Azure.AD.CommonLibrary.AadNeedAuthenticationException] 
     {Connect-AzureAD -AzureEnvironmentName AzureUSGovernment }
+     
+Write-host "NOTE: Azure AD limits the number of groups in a responses to 100 objects" -ForegroundColor Yellow
+Write-host "Enter a ""Startswith"" filter Example: ""VA-Azure-IAM""" -ForegroundColor Yellow
+$GroupFilter = Read-Host "DisplayName ""Startswith"" filter" 
 
 # Get Role Group
 
-$RoleGroup = get-azureadgroup | Out-GridView -Title "Select Role Group" -OutputMode Single 
+$RoleGroup = get-azureadgroup -filter "startswith(Displayname, '$($GroupFilter)')"  | Out-GridView -Title "Select Role Group" -OutputMode Single 
 
 # Get Role 
 
@@ -51,18 +55,26 @@ foreach ( $sub in $subs )
 
 # Git-R-Done
 
-foreach ( $RG in $RGs )
-{
-   
-    Write-Host "Working with RG ""$($RG.ResourceGroupName)"" in Sub ""$($RG.Subscription)""" -ForegroundColor Cyan
-    
-    Select-AzureRmSubscription -SubscriptionName $RG.Subscription | Out-Null
+If ($Null -eq $RoleGroup -or $Null -eq $Role -or $Null -eq $subs -or $Null -eq $RGs ) { Write-Host "Missing critical information, stopping" -ForegroundColor Red;  Break }
 
-    Write-Host "New Azure Role Assigment for Group ""$($RoleGroup.DisplayName)"" with Role of ""$($Role.Name)"" on RG ""$($RG.ResourceGroupName)"""
+Write-Host "`nNOTE: New Role ""$($Role.Name)"" will be applied to $($RGs.count) Resource Group" -ForegroundColor Cyan
 
-    New-AzureRmRoleAssignment -ObjectId $RoleGroup.ObjectId -RoleDefinitionName $Role.Name  -ResourceGroupName $RG.ResourceGroupName
+Write-Host "`nType ""BreakGlass"" to perform role assignement, or Ctrl-C to Exit" -ForegroundColor Green
+$HostInput = $NullBre
+$HostInput = Read-Host "Final Answer" 
+If ($HostInput -eq "BreakGlass" ) {
+
+    foreach ( $RG in $RGs )
+    {
+       
+        Write-Host "Working with RG ""$($RG.ResourceGroupName)"" in Sub ""$($RG.Subscription)""" -ForegroundColor Cyan
         
+        Select-AzureRmSubscription -SubscriptionName $RG.Subscription | Out-Null
+    
+        Write-Host "New Azure Role Assigment for Group ""$($RoleGroup.DisplayName)"" with Role of ""$($Role.Name)"" on RG ""$($RG.ResourceGroupName)""" -ForegroundColor Cyan
+    
+        New-AzureRmRoleAssignment -ObjectId $RoleGroup.ObjectId -RoleDefinitionName $Role.Name  -ResourceGroupName $RG.ResourceGroupName
+            
+    }
+
 }
-
-
-
