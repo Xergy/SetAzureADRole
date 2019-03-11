@@ -60,7 +60,7 @@ If ($Null -eq $RoleGroup -or $Null -eq $Role -or $Null -eq $subs -or $Null -eq $
 Write-Host "`nNOTE: New Role ""$($Role.Name)"" will be applied to $($RGs.count) Resource Group" -ForegroundColor Cyan
 
 Write-Host "`nType ""BreakGlass"" to perform role assignement, or Ctrl-C to Exit" -ForegroundColor Green
-$HostInput = $NullBre
+$HostInput = $Null
 $HostInput = Read-Host "Final Answer" 
 If ($HostInput -eq "BreakGlass" ) {
 
